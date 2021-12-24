@@ -68,8 +68,17 @@ export const getUserByIdentityNumber = async (req,res) => {
 
 export const getUsers = async (req,res) => {
     try{
+        let key = `all`;
+        let get = await promisify(redis().get).bind(redis());
+        let data = await get(key);
+        if (data) {
+            let obj = JSON.parse(data);
+            res.json({getFrom:"redis",obj});
+        } else {
         const users = await User.find();
-        res.json(users);
+        redis().setex(key, 600, JSON.stringify(users));
+        res.json({getFrom:"mongodb",users});
+        }
     }catch(error){
         res.status(500).json({message: error.message});
     }

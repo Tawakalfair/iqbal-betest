@@ -1,9 +1,7 @@
 FROM node:alpine
 
-RUN mkdir /apps
-ADD . /apps
-WORKDIR /apps
-
-RUN npm install --quiet
-
-CMD npm start
+WORKDIR /app
+COPY package.json .
+RUN npm install
+COPY . ./
+CMD ["node","app.js"]
